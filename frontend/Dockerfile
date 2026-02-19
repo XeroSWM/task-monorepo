@@ -7,16 +7,17 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-# Vite empaqueta todo el código estático en la carpeta 'dist'
 RUN npm run build 
 
 # Etapa 2: Producción (Servidor Web)
 FROM nginx:alpine
 
-# Copiamos los archivos compilados del builder a la carpeta pública de NGINX
+# ---> AÑADE ESTA LÍNEA AQUÍ <---
+# Sobrescribe la configuración por defecto para soportar React Router
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Exponer el puerto interno del contenedor
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -26,9 +26,10 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Obtener estadísticas del usuario
+// Obtener estadísticas del usuario y totales del sistema
 app.get('/stats', authenticateToken, async (req, res) => {
   try {
+    // 1. Obtener las tareas del usuario logueado
     const statsResult = await pool.query(`
       SELECT status, COUNT(*) as count 
       FROM tasks 
@@ -36,8 +37,19 @@ app.get('/stats', authenticateToken, async (req, res) => {
       GROUP BY status
     `, [req.user.id]);
     
-    // Formatear la respuesta para el frontend
-    const stats = { total: 0, pendiente: 0, completada: 0 };
+    // 2. Contar el total de usuarios registrados en el sistema
+    const usersResult = await pool.query(`
+      SELECT COUNT(*) as total_users FROM users
+    `);
+    
+    // 3. Formatear la respuesta para el frontend
+    const stats = { 
+      total: 0, 
+      pendiente: 0, 
+      completada: 0, 
+      totalUsuarios: parseInt(usersResult.rows[0].total_users) // Agregamos la nueva métrica aquí
+    };
+    
     statsResult.rows.forEach(row => {
         stats[row.status] = parseInt(row.count);
         stats.total += parseInt(row.count);
@@ -45,8 +57,10 @@ app.get('/stats', authenticateToken, async (req, res) => {
 
     res.json(stats);
   } catch (err) {
+    console.error("Error obteniendo estadísticas:", err);
     res.status(500).json({ error: 'Error obteniendo estadísticas' });
   }
 });
+
 
 app.listen(PORT, () => console.log(`Dashboard Service (Final) en puerto ${PORT}`));

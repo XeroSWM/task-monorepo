@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 1. Base de datos compartida
   db:
     image: postgres:15-alpine
     environment:
@@ -8,16 +9,17 @@ services:
       POSTGRES_PASSWORD: taskpassword
       POSTGRES_DB: taskdb
     ports:
-      - "5432:5432"
+      - "5432:5432" # Expuesto por si quieres conectarte con DBeaver o pgAdmin
     networks:
       - task-network
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  # 2. API Gateway (Punto único de entrada)
   api-gateway:
     build: ./api-gateway
     ports:
-      - "80:80" # Tu único punto de acceso local (http://localhost)
+      - "80:80" # Accederás a toda tu app desde http://localhost
     depends_on:
       - frontend
       - auth-service
@@ -26,41 +28,53 @@ services:
     networks:
       - task-network
 
+  # 3. Frontend (React + Vite servido con NGINX)
   frontend:
     build: ./frontend
     networks:
       - task-network
 
+  # 4. Microservicio de Autenticación
   auth-service:
     build: ./auth-service
     environment:
+      - PORT=3001
       - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
-    networks:
-      - task-network
+      - JWT_SECRET=supersecreto_para_desarrollo
     depends_on:
       - db
+    networks:
+      - task-network
 
+  # 5. Microservicio de Core (Tareas)
   core-service:
     build: ./core-service
     environment:
+      - PORT=3002
       - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
-    networks:
-      - task-network
+      - JWT_SECRET=supersecreto_para_desarrollo
     depends_on:
       - db
+    networks:
+      - task-network
 
+  # 6. Microservicio de Dashboard (Estadísticas)
   dashboard-service:
     build: ./dashboard-service
     environment:
+      - PORT=3003
       - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
-    networks:
-      - task-network
+      - JWT_SECRET=supersecreto_para_desarrollo
     depends_on:
       - db
+    networks:
+      - task-network
 
+# Configuración de red interna (vital para que NGINX Gateway los encuentre por su nombre)
 networks:
   task-network:
     driver: bridge
 
+# Volumen para que los datos de PostgreSQL no se borren al apagar los contenedores
 volumes:
   db_data:
