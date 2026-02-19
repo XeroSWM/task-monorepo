@@ -1,0 +1,27 @@
+# =========================
+# TERRAFORM
+# =========================
+
+# Ignorar la carpeta pesada donde se descargan los proveedores (AWS) y módulos
+**/.terraform/*
+
+# Ignorar los archivos de estado (¡CRÍTICO! Aquí se guardan contraseñas en texto plano)
+*.tfstate
+*.tfstate.*
+
+# Ignorar tus archivos de variables con credenciales reales
+*.tfvars
+*.tfvars.json
+
+# Ignorar archivos de logs de errores si Terraform falla
+crash.log
+crash.*.log
+
+# Ignorar archivos de planes guardados
+*tfplan*
+
+# Ignorar archivos de sobrescritura local
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

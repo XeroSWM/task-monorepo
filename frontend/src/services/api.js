@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // En desarrollo local apunta al Gateway (localhost:80 o simplemente la raíz)
-  baseURL: 'http://localhost', 
+  // Se deja en blanco para que detecte automáticamente el dominio del ALB en AWS
+  baseURL: '', 
 });
 
 // Interceptor para enviar el token en cada petición
