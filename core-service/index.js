@@ -11,7 +11,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto_para_desarrollo';
 app.use(cors());
 app.use(express.json());
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Esencial para aceptar el certificado de seguridad de AWS
+  }
+});
 
 // Inicializar tabla de tareas
 pool.query(`
