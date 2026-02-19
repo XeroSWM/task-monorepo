@@ -1,0 +1,34 @@
+name: Build and Push to Docker Hub
+
+# Esto hace que el pipeline se ejecute cada vez que hagas push a la rama 'main'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # La estrategia matrix ejecutará este job 5 veces en paralelo, una por cada servicio
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, core-service, dashboard-service, frontend]
+
+    steps:
+      - name: 📥 Descargar código del repositorio
+        uses: actions/checkout@v3
+
+      - name: 🔑 Iniciar sesión en Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: 🐳 Construir y subir imagen de ${{ matrix.service }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./${{ matrix.service }}
+          push: true
+          # La imagen se etiquetará como: tu-usuario/nombre-del-servicio:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
