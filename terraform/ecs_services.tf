@@ -39,6 +39,9 @@ resource "aws_ecs_service" "frontend" {
     container_name   = "frontend"
     container_port   = 80
   }
+
+  # Obliga a esperar a que el puerto 80 del balanceador exista
+  depends_on = [aws_lb_listener.http]
 }
 
 # ==========================================
@@ -87,6 +90,9 @@ resource "aws_ecs_service" "auth_service" {
     container_name   = "auth-service"
     container_port   = 3001
   }
+
+  # Obliga a esperar a que la regla de enrutamiento /api/auth/* exista
+  depends_on = [aws_lb_listener_rule.auth_rule]
 }
 
 # ==========================================
@@ -135,6 +141,9 @@ resource "aws_ecs_service" "core_service" {
     container_name   = "core-service"
     container_port   = 3002
   }
+
+  # Obliga a esperar a que la regla de enrutamiento /api/core/* exista
+  depends_on = [aws_lb_listener_rule.core_rule]
 }
 
 # ==========================================
@@ -183,4 +192,7 @@ resource "aws_ecs_service" "dashboard_service" {
     container_name   = "dashboard-service"
     container_port   = 3003
   }
+
+  # Obliga a esperar a que la regla de enrutamiento /api/dashboard/* exista
+  depends_on = [aws_lb_listener_rule.dashboard_rule]
 }
