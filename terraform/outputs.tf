@@ -4,17 +4,17 @@ output "url_sistema_alb" {
 }
 
 output "ip_frontend" { 
-  value = aws_instance.frontend.public_ip 
+  value = aws_eip.frontend_eip.public_ip 
 }
 
 output "ip_auth" { 
-  value = aws_instance.auth.public_ip 
+  value = aws_eip.auth_eip.public_ip 
 }
 
 output "ip_core" { 
-  value = aws_instance.core.public_ip 
+  value = aws_eip.core_eip.public_ip 
 }
 
 output "ip_dashboard" { 
-  value = aws_instance.dashboard.public_ip 
+  value = aws_eip.dashboard_eip.public_ip 
 }

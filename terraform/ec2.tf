@@ -86,3 +86,31 @@ resource "aws_lb_target_group_attachment" "dashboard" {
   target_id        = aws_instance.dashboard.id
   port             = 3003
 }
+
+# ==========================================
+# IPs ELÁSTICAS (EIP) PARA LAS INSTANCIAS
+# ==========================================
+
+resource "aws_eip" "frontend_eip" {
+  instance = aws_instance.frontend.id
+  domain   = "vpc"
+  tags     = { Name = "Frontend-EIP" }
+}
+
+resource "aws_eip" "auth_eip" {
+  instance = aws_instance.auth.id
+  domain   = "vpc"
+  tags     = { Name = "Auth-EIP" }
+}
+
+resource "aws_eip" "core_eip" {
+  instance = aws_instance.core.id
+  domain   = "vpc"
+  tags     = { Name = "Core-EIP" }
+}
+
+resource "aws_eip" "dashboard_eip" {
+  instance = aws_instance.dashboard.id
+  domain   = "vpc"
+  tags     = { Name = "Dashboard-EIP" }
+}
