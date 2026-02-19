@@ -20,7 +20,6 @@ module "vpc" {
 # 1. Security Group para el ALB (Expuesto a Internet)
 resource "aws_security_group" "alb_sg" {
   name        = "task-alb-sg"
-  description = "Permitir trafico HTTP de internet"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
@@ -29,7 +28,6 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -38,48 +36,25 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# 2. Security Group para los Microservicios (ECS)
-resource "aws_security_group" "ecs_sg" {
-  name        = "task-ecs-sg"
-  description = "Permitir trafico interno y desde el ALB"
+# 2. Security Group para las Instancias EC2
+resource "aws_security_group" "ec2_sg" {
+  name        = "task-ec2-sg"
   vpc_id      = module.vpc.vpc_id
 
-  # Permitir entrada desde el balanceador (al puerto 80 del API Gateway)
+  # Permitir entrada desde el balanceador a todos los puertos
   ingress {
     from_port       = 80
-    to_port         = 80
+    to_port         = 3003
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
-
-  # ¡LA SOLUCIÓN A TU PROBLEMA DE COMUNICACIÓN!
-  # Permite que todos los servicios dentro de este SG hablen entre sí libremente
+  
+  # Opcional: Permitir acceso directo para que veas tus IPs públicas funcionar
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 80
+    to_port     = 3003
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# 3. Security Group para la Base de Datos (RDS)
-resource "aws_security_group" "rds_sg" {
-  name        = "task-rds-sg"
-  description = "Permitir trafico de DB solo desde ECS"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_sg.id]
   }
 
   egress {
