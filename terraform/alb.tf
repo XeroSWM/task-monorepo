@@ -12,8 +12,11 @@ resource "aws_lb_target_group" "frontend" {
   port        = 80
   protocol    = "HTTP"
   vpc_id      = module.vpc.vpc_id
-  target_type = "instance" # <-- Apunta a Instancias EC2
-  health_check { path = "/" }
+  target_type = "instance"
+  
+  health_check { 
+    path = "/" 
+  }
 }
 
 resource "aws_lb_target_group" "auth" {
@@ -22,7 +25,11 @@ resource "aws_lb_target_group" "auth" {
   protocol    = "HTTP"
   vpc_id      = module.vpc.vpc_id
   target_type = "instance"
-  health_check { path = "/", matcher = "200-499" }
+  
+  health_check { 
+    path    = "/"
+    matcher = "200-499" 
+  }
 }
 
 resource "aws_lb_target_group" "core" {
@@ -31,7 +38,11 @@ resource "aws_lb_target_group" "core" {
   protocol    = "HTTP"
   vpc_id      = module.vpc.vpc_id
   target_type = "instance"
-  health_check { path = "/", matcher = "200-499" }
+  
+  health_check { 
+    path    = "/"
+    matcher = "200-499" 
+  }
 }
 
 resource "aws_lb_target_group" "dashboard" {
@@ -40,7 +51,11 @@ resource "aws_lb_target_group" "dashboard" {
   protocol    = "HTTP"
   vpc_id      = module.vpc.vpc_id
   target_type = "instance"
-  health_check { path = "/", matcher = "200-499" }
+  
+  health_check { 
+    path    = "/"
+    matcher = "200-499" 
+  }
 }
 
 # 2. El Listener (Escucha el puerto 80)
@@ -59,20 +74,47 @@ resource "aws_lb_listener" "http" {
 resource "aws_lb_listener_rule" "auth_rule" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 10
-  action { type = "forward", target_group_arn = aws_lb_target_group.auth.arn }
-  condition { path_pattern { values = ["/api/auth/*"] } }
+  
+  action { 
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.auth.arn 
+  }
+  
+  condition { 
+    path_pattern { 
+      values = ["/api/auth/*"] 
+    } 
+  }
 }
 
 resource "aws_lb_listener_rule" "core_rule" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 20
-  action { type = "forward", target_group_arn = aws_lb_target_group.core.arn }
-  condition { path_pattern { values = ["/api/core/*"] } }
+  
+  action { 
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.core.arn 
+  }
+  
+  condition { 
+    path_pattern { 
+      values = ["/api/core/*"] 
+    } 
+  }
 }
 
 resource "aws_lb_listener_rule" "dashboard_rule" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 30
-  action { type = "forward", target_group_arn = aws_lb_target_group.dashboard.arn }
-  condition { path_pattern { values = ["/api/dashboard/*"] } }
+  
+  action { 
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.dashboard.arn 
+  }
+  
+  condition { 
+    path_pattern { 
+      values = ["/api/dashboard/*"] 
+    } 
+  }
 }
