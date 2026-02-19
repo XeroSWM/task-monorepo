@@ -19,10 +19,11 @@ resource "aws_s3_bucket" "app_storage" {
 resource "aws_s3_bucket_cors_configuration" "app_storage_cors" {
   bucket = aws_s3_bucket.app_storage.id
 
-  cors_rule {
+ cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-    allowed_origins = ["*"] # En producción se cambia por la URL de tu ALB
+    # Terraform pondrá tu link de AWS automáticamente aquí:
+    allowed_origins = ["http://${aws_lb.main.dns_name}"] 
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
