@@ -26,8 +26,8 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Obtener estadísticas del usuario y totales del sistema
-app.get('/stats', authenticateToken, async (req, res) => {
+// Obtener estadísticas del usuario y totales del sistema - Ruta actualizada para el ALB de AWS
+app.get('/api/dashboard/stats', authenticateToken, async (req, res) => {
   try {
     // 1. Obtener las tareas del usuario logueado
     const statsResult = await pool.query(`
@@ -61,6 +61,5 @@ app.get('/stats', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error obteniendo estadísticas' });
   }
 });
-
 
 app.listen(PORT, () => console.log(`Dashboard Service (Final) en puerto ${PORT}`));

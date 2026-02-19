@@ -38,8 +38,8 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Obtener tareas del usuario logueado
-app.get('/tasks', authenticateToken, async (req, res) => {
+// Obtener tareas del usuario logueado - Ruta actualizada para el ALB
+app.get('/api/core/tasks', authenticateToken, async (req, res) => {
   try {
     const tasks = await pool.query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
     res.json(tasks.rows);
@@ -48,8 +48,8 @@ app.get('/tasks', authenticateToken, async (req, res) => {
   }
 });
 
-// Crear tarea
-app.post('/tasks', authenticateToken, async (req, res) => {
+// Crear tarea - Ruta actualizada para el ALB
+app.post('/api/core/tasks', authenticateToken, async (req, res) => {
   const { title, description } = req.body;
   try {
     const newTask = await pool.query(
@@ -62,8 +62,8 @@ app.post('/tasks', authenticateToken, async (req, res) => {
   }
 });
 
-// Actualizar estado de la tarea (ej. de pendiente a completada)
-app.put('/tasks/:id', authenticateToken, async (req, res) => {
+// Actualizar estado de la tarea - Ruta actualizada para el ALB
+app.put('/api/core/tasks/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   try {
@@ -78,13 +78,13 @@ app.put('/tasks/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Eliminar tarea
-app.delete('/tasks/:id', authenticateToken, async (req, res) => {
+// Eliminar tarea - Ruta actualizada para el ALB
+app.delete('/api/core/tasks/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
       const result = await pool.query('DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING *', [id, req.user.id]);
       if (result.rowCount === 0) return res.status(404).json({ error: 'Tarea no encontrada' });
-      res.json({ message: 'Tarea eliminada correctamente' });
+      res.json({ message : 'Tarea eliminada correctamente' });
     } catch (err) {
       res.status(500).json({ error: 'Error eliminando tarea' });
     }

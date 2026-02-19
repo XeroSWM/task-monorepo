@@ -24,8 +24,8 @@ pool.query(`
   )
 `).catch(err => console.error("Error creando tabla users:", err));
 
-// Registro de usuario
-app.post('/register', async (req, res) => {
+// Registro de usuario - Ruta actualizada para el ALB de AWS
+app.post('/api/auth/register', async (req, res) => {
   const { email, password } = req.body;
   try {
     const salt = await bcrypt.genSalt(10);
@@ -42,8 +42,8 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login
-app.post('/login', async (req, res) => {
+// Login - Ruta actualizada para el ALB de AWS
+app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
