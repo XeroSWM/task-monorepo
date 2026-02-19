@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpassword
+      POSTGRES_DB: taskdb
+    ports:
+      - "5432:5432"
+    networks:
+      - task-network
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "80:80" # Tu único punto de acceso local (http://localhost)
+    depends_on:
+      - frontend
+      - auth-service
+      - core-service
+      - dashboard-service
+    networks:
+      - task-network
+
+  frontend:
+    build: ./frontend
+    networks:
+      - task-network
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
+    networks:
+      - task-network
+    depends_on:
+      - db
+
+  core-service:
+    build: ./core-service
+    environment:
+      - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
+    networks:
+      - task-network
+    depends_on:
+      - db
+
+  dashboard-service:
+    build: ./dashboard-service
+    environment:
+      - DATABASE_URL=postgresql://taskuser:taskpassword@db:5432/taskdb
+    networks:
+      - task-network
+    depends_on:
+      - db
+
+networks:
+  task-network:
+    driver: bridge
+
+volumes:
+  db_data:
