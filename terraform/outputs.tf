@@ -18,3 +18,8 @@ output "ip_core" {
 output "ip_dashboard" { 
   value = aws_eip.dashboard_eip.public_ip 
 }
+
+output "nombre_bucket_s3" { 
+  value       = aws_s3_bucket.app_storage.bucket
+  description = "El nombre único de tu bucket para configurar en Node.js"
+}
